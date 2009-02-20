@@ -50,7 +50,7 @@ class RLGrep
   
   def puts_file_name_if_needed
     unless @file_name_putted
-      puts ANSI.color(:green) {file_name}
+      puts ANSI.color(:red) {file_name}
       @file_name_putted = true
     end
   end
@@ -78,7 +78,7 @@ class RLGrep
   
   def highlight(block)
     block.gsub(/(#{highlighted})/) do
-      ANSI.color(:red) {$1}
+      ANSI.color(:green) {$1}
     end
   end
   
@@ -89,7 +89,6 @@ class RLGrep
         block = colorize(block) if needs_colorize
         block = highlight(block) unless highlighted.blank?
         puts_file_name_if_needed
-        # $stderr.puts block[TRANSLATION_REGEXP]
         begin
           puts block 
         rescue Errno::EPIPE
