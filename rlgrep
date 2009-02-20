@@ -59,11 +59,15 @@ class RLGrep
     end
   end
   
+  
+  SESSION_REGEXP = %r"^  Session ID: (\w+\n)+\w+(=*)--\w+\n"m
+  
   def start_stdin
     each_block do |block|
       if block_matches(block)
+        block = block.gsub(SESSION_REGEXP, '') if axe_session
         puts_file_name_if_needed
-        puts block
+        puts block#[SESSION_REGEXP]
       end
     end
   end
@@ -72,6 +76,7 @@ class RLGrep
     files.each do |file|
       cat = (file =~ /.gz$/) ? 'gzip -c -d' : 'cat'
       command_line = "#{cat} #{file} | #{$0} --stdin=#{Shellwords::escape(file)} #{Shellwords::escape(regexp.to_s)}"
+      command_line += " -x" if axe_session
       # $stderr.puts command_line
       system(command_line)
     end
