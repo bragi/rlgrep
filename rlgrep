@@ -18,7 +18,7 @@ class String
 end
 
 class RLGrep
-  attr_accessor :files, :regexp, :file_name, :stdin, :needs_cleanup, :needs_colorize, :highlighted
+  attr_accessor :files, :regexp, :file_name, :stdin, :needs_cleanup, :needs_colorize, :highlighted, :highlighted_params
   
   def initialize
     parse_arguments
@@ -29,7 +29,8 @@ class RLGrep
       ['--stdin', '-s', GetoptLong::REQUIRED_ARGUMENT],
       ['--cleanup', '-x', GetoptLong::NO_ARGUMENT],
       ['--colorize', '-c', GetoptLong::NO_ARGUMENT],
-      ['--highlight', '-i', GetoptLong::REQUIRED_ARGUMENT]
+      ['--highlight', '-i', GetoptLong::REQUIRED_ARGUMENT],
+      ['--highlight-param', '-p', GetoptLong::REQUIRED_ARGUMENT]
     )
     options.each do |option, arg|
       case option
@@ -42,6 +43,8 @@ class RLGrep
         self.needs_colorize = true
       when '--highlight'
         self.highlighted = arg
+      when '--highlight-param'
+        self.highlighted_params = arg
       end
     end
     self.regexp = Regexp.new ARGV.shift
@@ -76,10 +79,17 @@ class RLGrep
     end
   end
   
-  def highlight(block)
-    block.gsub(/(#{highlighted})/) do
+  def highlight(block, highlighted)
+    block.gsub(highlighted) do
       ANSI.color(:green) {$1}
     end
+  end
+  
+  def highlight_params(block)
+    highlighted_params.split(",").each do |param|
+      block = highlight(block, /("#{param}"=>("[^"]+"|\{[^}]+\}))/)
+    end
+    block
   end
   
   def start_stdin
@@ -87,7 +97,8 @@ class RLGrep
       if block_matches(block)
         block = block.gsub(SESSION_REGEXP, '').gsub(TRANSLATION_REGEXP, '') if needs_cleanup
         block = colorize(block) if needs_colorize
-        block = highlight(block) unless highlighted.blank?
+        block = highlight(block, /(#{highlighted})/) unless highlighted.blank?
+        block = highlight_params(block) unless highlighted_params.blank?
         puts_file_name_if_needed
         begin
           puts block 
@@ -105,7 +116,9 @@ class RLGrep
       command_line += " -x" if needs_cleanup
       command_line += " -c" if needs_colorize
       command_line += " --highlight=#{Shellwords::escape(highlighted)}" unless highlighted.blank?
+      command_line += " --highlight-param=#{Shellwords::escape(highlighted_params)}" unless highlighted_params.blank?
       system(command_line)
+      return unless $? == 0
     end
   end
   
