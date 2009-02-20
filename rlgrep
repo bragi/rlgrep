@@ -1,0 +1,91 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'ansi'
+require 'getoptlong'
+
+class NilClass
+  def blank?
+    true
+  end
+end
+
+class String
+  def blank?
+    self.strip == ""
+  end
+end
+
+class RLGrep
+  attr_accessor :files, :regexp, :file_name, :stdin
+  
+  def initialize
+    parse_arguments
+  end
+  
+  def parse_arguments
+    options = GetoptLong.new(
+      [ '--stdin', '-s', GetoptLong::REQUIRED_ARGUMENT ]
+    )
+    options.each do |option, arg|
+      case option
+      when '--stdin' 
+        self.stdin = true
+        self.file_name = arg
+      end
+    end
+    self.regexp = Regexp.new ARGV.shift
+    self.files = ARGV
+  end
+  
+  def puts_file_name_if_needed
+    unless @file_name_putted
+      puts ANSI.color(:green) {file_name}
+      @file_name_putted = true
+    end
+  end
+  
+  def block_matches(block)
+    block =~ regexp
+  end
+  
+  def each_block
+    block = []
+    last_line = ''
+    STDIN.each_line do |line|
+      block << line
+      if last_line.blank? && line.blank?
+        yield block.join
+      end
+      last_line = line
+    end
+  end
+  
+  def start_stdin
+    each_block do |block|
+      if block_matches(block)
+        puts_file_name_if_needed
+        puts block
+      end
+    end
+  end
+  
+  def start_multiple
+    files.each do |file|
+      cat = (file =~ /.gz$/) ? 'gzip -c -d' : 'cat'
+      command_line = "#{cat} #{file} | #{$0} --stdin=#{file} \"#{regexp}\""
+      $stderr.puts command_line
+      system(command_line)
+    end
+  end
+  
+  def start
+    if stdin
+      start_stdin
+    else
+      start_multiple
+    end
+  end
+end
+
+RLGrep.new.start
