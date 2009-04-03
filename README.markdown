@@ -3,6 +3,17 @@ rlgrep
 
 rlgrep - grep for Ruby on Rails log files. Can grep through multiple files at once, including gzipped ones.
 
+Installation
+------------
+
+1.  Install necessary dependencies
+
+        sudo gem install facets
+1.  Download rlgrep
+
+        git clone git://github.com/bragi/rlgrep.git
+1.  put the script in PATH
+
 Usage
 -----
 
