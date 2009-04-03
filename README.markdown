@@ -8,8 +8,9 @@ Installation
 
 1.  Install necessary dependencies
 
+        sudo gem install echoe
         sudo gem install facets
-        sudo gem install ssoroka-ansi
+        sudo gem install ssoroka-ansi --source=http://gems.github.com
 
 1.  Download rlgrep
 
