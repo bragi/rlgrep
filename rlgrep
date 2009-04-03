@@ -63,8 +63,8 @@ class RLGrep
   end
   
   def each_block
-    STDIN.read.split("\n\n").each do |block|
-      yield block
+    STDIN.read.split("\n\nProcessing").each do |block|
+      yield "\n\nProcessing" + block
     end
   end
   
