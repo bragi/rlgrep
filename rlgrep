@@ -19,9 +19,24 @@ end
 
 class RLGrep
   attr_accessor :files, :regexp, :file_name, :stdin, :needs_cleanup, :needs_colorize, :highlighted, :highlighted_params
-  
-  def initialize
-    parse_arguments
+
+  def help_text
+    "rlgrep - utility to grep Ruby on Rails log files
+Supports both plain and gzipped files
+
+Usage: rlgrep [options] regular_expression log/production.log{1.gz,}
+
+Available options:
+-c, --colorize    highlight important elements of request
+-h, --help        display this help
+-i pattern, --highlight=pattern
+                  highlight specified pattern
+-p param, --highlight-param=param
+                  highlight specified param
+-s file_name, --stdin=file_name
+                  parse file from STDIN, display it's name as file_name
+-x, --cleanup     remove session information
+"
   end
   
   def parse_arguments
@@ -30,8 +45,10 @@ class RLGrep
       ['--cleanup', '-x', GetoptLong::NO_ARGUMENT],
       ['--colorize', '-c', GetoptLong::NO_ARGUMENT],
       ['--highlight', '-i', GetoptLong::REQUIRED_ARGUMENT],
-      ['--highlight-param', '-p', GetoptLong::REQUIRED_ARGUMENT]
+      ['--highlight-param', '-p', GetoptLong::REQUIRED_ARGUMENT],
+      ['--help', '-h', GetoptLong::NO_ARGUMENT]
     )
+    help_needed = false
     options.each do |option, arg|
       case option
       when '--stdin' 
@@ -45,8 +62,13 @@ class RLGrep
         self.highlighted = arg
       when '--highlight-param'
         self.highlighted_params = arg
+      when '--help'
+        help_needed = true
       end
     end
+    
+    return false if help_needed
+    
     self.regexp = Regexp.new ARGV.shift
     self.files = ARGV
   end
@@ -123,10 +145,14 @@ class RLGrep
   end
   
   def start
-    if stdin
-      start_stdin
+    if parse_arguments
+      if stdin
+        start_stdin
+      else
+        start_multiple
+      end
     else
-      start_multiple
+      puts help_text
     end
   end
 end
