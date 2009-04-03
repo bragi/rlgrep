@@ -1,10 +1,10 @@
 rlgrep
-------
+======
 
 rlgrep - grep for Ruby on Rails log files. Can grep through multiple files at once, including gzipped ones.
 
 Usage
-=====
+-----
 
     rlgrep [options] regular_expression log files
 
@@ -20,6 +20,6 @@ Usage
     -x, --cleanup     remove session information
 
 My Favourite Usage
-==================
+------------------
 
     rlgrep -c -x -p action -i 'Rendering: [0-9\.]+' '"show"' production.log{.{3..1}.gz,} | less
