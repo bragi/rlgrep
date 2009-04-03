@@ -1,7 +1,7 @@
 rlgrep
 ======
 
-rlgrep - grep for Ruby on Rails log files. Allows to search strings in whole requests (unlike grep, which can only search lines). Can grep through multiple files at once, including gzipped ones.
+`rlgrep` - grep for Ruby on Rails log files. Allows to search strings in whole requests (unlike grep, which can only search lines). Can grep through multiple files at once, including gzipped ones.
 
 Installation
 ------------
@@ -9,9 +9,12 @@ Installation
 1.  Install necessary dependencies
 
         sudo gem install facets
+        sudo gem install ssoroka-ansi
+
 1.  Download rlgrep
 
         git clone git://github.com/bragi/rlgrep.git
+
 1.  put the script in PATH
 
 Usage
