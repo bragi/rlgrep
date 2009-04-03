@@ -37,4 +37,5 @@ Usage
 My Favourite Usage
 ------------------
 
-    rlgrep -c -x -p action -i 'Rendering: [0-9\.]+' '"show"' production.log{.{3..1}.gz,} | less
+    rlgrep -c -x -p action -i 'Rendering: [0-9\.]+' '"show"' production.log{.{3..1}.gz,} | less -Rf
+
