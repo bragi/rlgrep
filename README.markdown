@@ -1,7 +1,7 @@
 rlgrep
 ======
 
-rlgrep - grep for Ruby on Rails log files. Can grep through multiple files at once, including gzipped ones.
+rlgrep - grep for Ruby on Rails log files. Allows to search strings in whole requests (unlike grep, which can only search lines). Can grep through multiple files at once, including gzipped ones.
 
 Installation
 ------------
